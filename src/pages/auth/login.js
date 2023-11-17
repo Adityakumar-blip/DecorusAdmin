@@ -39,23 +39,24 @@ const Page = () => {
     }),
     onSubmit: async (values, helpers) => {
       const loading = toast.loading("Loading...");
-      // dispatch(SignIn(values))
-      //   .then((res) => {
-      //     if (res?.payload?.data.success) {
-      //       router.push("/");
-      //       toast.dismiss(loading);
-      //       toast.success(res?.payload?.data?.Message);
-      //     } else {
-      //       toast.dismiss(loading);
-      //       toast.error("Permission denied");
-      //     }
-      //   })
-      //   .catch((err) => {
-      //     toast.dismiss(loading);
-      //     toast.error("An error occured");
-      //   });
-      router.push("/users");
-      toast.dismiss(loading);
+      dispatch(SignIn(values))
+        .then((res) => {
+          if (res) {
+            router.push("/users");
+            toast.dismiss(loading);
+            toast.success(res?.payload?.data?.Message);
+          } else {
+            toast.dismiss(loading);
+            toast.error("Permission denied");
+          }
+        })
+        .catch((err) => {
+          toast.dismiss(loading);
+          console.log("sign in error", err);
+          toast.error("An error occured");
+        });
+      // router.push("/users");
+      // toast.dismiss(loading);
     },
   });
 

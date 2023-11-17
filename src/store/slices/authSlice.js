@@ -6,9 +6,9 @@ import {
   signInWithPhoneNumber,
 } from "firebase/auth";
 import { toast } from "react-hot-toast";
-import { auth, db } from "src/contexts/firebase-context";
+// import { db, auth } from "../../utils/firebaseconfig";
 import { setLoading } from "./adminSlice";
-import { getFirestore, collection, getDocs, where } from "firebase/firestore/lite";
+import { getFirestore, collection, getDocs, where, query } from "firebase/firestore/lite";
 
 const ISSERVER = typeof window === "undefined";
 
@@ -27,14 +27,12 @@ const initialState = {
 
 export const SignIn = createAsyncThunk("auth/signIn", async (values, { dispatch }) => {
   try {
-    const { email, password } = values;
     console.log("values", values);
-    // Initialize Firebase Firestore
+    const { email, password } = values;
     const db = getFirestore();
-
     const usersCollection = collection(db, "users");
-    const query = where("email", "==", email);
-    const userSnapshot = await getDocs(collection(usersCollection, query));
+    const query1 = query(usersCollection, where("email", "==", email));
+    const userSnapshot = await getDocs(query1);
 
     if (userSnapshot.empty) {
       // User doesn't exist
@@ -42,12 +40,13 @@ export const SignIn = createAsyncThunk("auth/signIn", async (values, { dispatch 
     }
 
     const userData = userSnapshot.docs[0].data();
+    console.log("User data info", userData);
 
     if (password === userData.password) {
-      if (userData.role.label === "superAdmin") {
-        // Handle authentication success for superAdmin
-        // You might want to store the user data in the Redux state here
-        // and dispatch additional actions if needed
+      if (userData.role === "admin") {
+        // Save authentication status to localStorage
+        localStorage.setItem("authenticated", true);
+
         return { status: "success", user: userData };
       } else {
         // Permission Denied
@@ -59,7 +58,8 @@ export const SignIn = createAsyncThunk("auth/signIn", async (values, { dispatch 
     }
   } catch (error) {
     console.error("Error", error);
-    return { status: "error", message: "An error occurred while login" };
+
+    return { status: "error", message: "An error occurred while logging in" };
   }
 });
 
