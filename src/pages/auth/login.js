@@ -54,7 +54,7 @@ const Page = () => {
       //     toast.dismiss(loading);
       //     toast.error("An error occured");
       //   });
-      router.push("/");
+      router.push("/users");
       toast.dismiss(loading);
     },
   });

@@ -19,7 +19,13 @@ import {
 import { Scrollbar } from "src/components/scrollbar";
 import { getInitials } from "src/utils/get-initials";
 import { useDispatch } from "react-redux";
-import { getAllAdminUsers, updateUser, updateUsers } from "src/store/slices/adminSlice";
+import {
+  getAllAdminUsers,
+  updateGroup,
+  updateUser,
+  updateUserAsync,
+  updateUsers,
+} from "src/store/slices/adminSlice";
 import DeleteModal from "src/utils/delete-modal";
 import { useState } from "react";
 
@@ -39,6 +45,7 @@ export const UserTable = (props) => {
     page,
     rowsPerPage = 0,
     selected = [],
+    updateRole,
   } = props;
 
   const [open, setOpen] = useState(false);
@@ -66,13 +73,17 @@ export const UserTable = (props) => {
   const updateStatus = (e, userId) => {
     console.log("userId", userId);
     const updatedData = {
-      userId,
-      isApproved: e.target.checked,
+      isApproved: e.target.checked === true ? "admin" : "user",
     };
-    dispatch(updateUser(updatedData)).then((res) => {
+    dispatch(
+      updateGroup({
+        userId,
+        updatedUserData: { role: e.target.checked === true ? "admin" : "user" },
+      })
+    ).then((res) => {
       if (res?.payload?.success) {
         // dispatch(updateUsers(res.payload.Data));
-        dispatch(getAllAdminUsers());
+        // dispatch(getAllAdminUsers());
       }
     });
   };
@@ -92,7 +103,7 @@ export const UserTable = (props) => {
                   <TableCell>Role</TableCell>
                   <TableCell>Phone No.</TableCell>
                   <TableCell>Admin</TableCell>
-                  <TableCell>Actions</TableCell>
+                  {/* <TableCell>Actions</TableCell> */}
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -113,14 +124,14 @@ export const UserTable = (props) => {
                       <TableCell>
                         <Switch
                           size="small"
-                          checked={customer?.isApproved}
+                          checked={customer?.role === "admin" ? true : false}
                           onChange={(e) => {
-                            updateStatus(e, customer?.userId);
+                            updateRole(customer?.id, e.target.checked === true ? "admin" : "user");
                           }}
                           inputProps={{ "aria-label": "controlled" }}
                         />
                       </TableCell>
-                      <TableCell>
+                      {/* <TableCell>
                         <IconButton aria-label="delete" onClick={() => handleOpen(customer.userId)}>
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -135,7 +146,7 @@ export const UserTable = (props) => {
                             />
                           </svg>
                         </IconButton>
-                      </TableCell>
+                      </TableCell> */}
                     </TableRow>
                   );
                 })}

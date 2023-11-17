@@ -41,7 +41,7 @@ const SignoutModal = ({ open, handleClose }) => {
             component="h6"
             style={{ color: "#ee5757" }}
           >
-            Are you sure you're ready to sign out?
+            Are you sure youre ready to sign out?
           </Typography>
           {/* <Typography id="modal-modal-title" fontSize={11} color="red" variant="h6" component="p">
             It will delete this document permanently.

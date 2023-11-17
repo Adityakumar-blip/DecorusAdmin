@@ -29,7 +29,7 @@ import { UserTable } from "src/sections/user/user-table";
 import MagnifyingGlassIcon from "@heroicons/react/24/solid/MagnifyingGlassIcon";
 import { toast } from "react-hot-toast";
 import UserModal from "src/utils/UserModal";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, doc, getDocs, updateDoc } from "firebase/firestore";
 import { db } from "src/utils/firebaseconfig";
 
 const now = new Date();
@@ -72,6 +72,32 @@ const Page = () => {
 
     fetchData();
   }, [db]);
+
+  const updateUserRole = async (userId, newRole) => {
+    console.log("User info", userId, newRole);
+    const userDocRef = doc(db, "users", userId);
+
+    try {
+      // Update the 'role' field with the new role
+      await updateDoc(userDocRef, {
+        role: newRole,
+      });
+
+      // Update the local state with the new role
+      setAllUsers((prevUsers) => {
+        return prevUsers.map((user) => {
+          if (user.id === userId) {
+            return { ...user, role: newRole };
+          }
+          return user;
+        });
+      });
+
+      console.log(`User role updated successfully for user with ID: ${userId}`);
+    } catch (error) {
+      console.error("Error updating user role:", error);
+    }
+  };
 
   return (
     <>
@@ -131,6 +157,7 @@ const Page = () => {
               page={page}
               rowsPerPage={rowsPerPage}
               // selected={customersSelection.selected}
+              updateRole={updateUserRole}
             />
           </Stack>
         </Container>
